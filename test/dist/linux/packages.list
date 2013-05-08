@@ -1,0 +1,10 @@
+2
+fbc-standalone
+This package provides the standalone version of the FreeBASIC compiler.
+none
+900
+
+fb-get-test
+This is a test package to check that fb-get is working correctly.
+none
+1

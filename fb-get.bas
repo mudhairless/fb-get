@@ -24,6 +24,7 @@
 #define PLATFORM "win32"
 #define INST_DIR CONF_DIR
 #define RM "rm"
+#define BINDIR exepath & "/bin/win32/"
 #else
 #define PKG_LIST "/usr/local/etc/freebasic/packages.list"
 #define CONF_DIR "/usr/local/etc/freebasic/"
@@ -33,14 +34,15 @@
 #define INST_DIR "/usr/local/"
 #define MANF_DIR "/usr/local/etc/freebasic/packages/"
 #define RM "del"
+#define BINDIR
 #endif
 
 
 #define REMOTE_URL "http://ext.freebasic.net/dist/" & PLATFORM & "/"
-#define WGETCMD(packagen) "wget -q -O " & CACHE_DIR & packagen & ".zip" & " " & REMOTE_URL & packagen & ".zip"
-#define UNZIPCMD(filen) "unzip -q -o -d . " & CACHE_DIR & filen
-#define MANIFEST(filen) "unzip -l " & CACHE_DIR & filen & ".zip > " & MANF_DIR & filen & ".manifest"
-#define GPGVCMD(filen) "gpgv -q --keyring " & CONF_DIR & "keyring.gpg " & CACHE_DIR & filen & ".zip.sign"
+#define WGETCMD(packagen) BINDIR & "wget -q -O " & CACHE_DIR & packagen & ".zip" & " " & REMOTE_URL & packagen & ".zip"
+#define UNZIPCMD(filen) BINDIR & "unzip -q -o -d . " & CACHE_DIR & filen
+#define MANIFEST(filen) BINDIR "unzip -l " & CACHE_DIR & filen & ".zip > " & MANF_DIR & filen & ".manifest"
+#define GPGVCMD(filen) BINDIR "gpgv -q --keyring " & CONF_DIR & "keyring.gpg " & CACHE_DIR & filen & ".zip.sign"
 
 #include once "vbcompat.bi"
 

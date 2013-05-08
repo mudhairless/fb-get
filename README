@@ -2,3 +2,41 @@ fb-get Package Management for FreeBASIC
 
 Easily install any package for FreeBASIC.
 Can also be used to install FreeBASIC itself.
+
+Usage: fb-get update|install [package]|remove [package]|list|search
+
+# Required commands
+
+ * wget (may switch to curl in future)
+ * unzip (may switch to lzma in future)
+ * gpgv (to verify packages are legit)
+
+Windows versions of all of these commands are available in the bin/win32 directory.
+
+# Commands
+## Update
+Connects to the remote server and retrieves the latest package list and public keys.
+
+## Install
+Usage: fb-get install package1 package2
+
+Installs the listed package(s).
+
+## Remove
+Usage: fb-get remove package1 package2
+
+Removes the listed package(s).
+
+## List
+Lists all currently installed packages.
+
+Use: 'fb-get list -all' to list all available packages and their status.
+
+## Search
+Usage: fb-get search "search string"
+
+Search for the search string in package names and descriptions.
+
+## clear-lock
+Use this command if something breaks and you need to clear the database lock.
+

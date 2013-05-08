@@ -76,7 +76,7 @@ if not fileexists(CACHE_DIR & "fbget.lock") then
         close #1
     end if
 else
-    print "The package database is currently locked."
+    print "The package database is currently locked. Use clear-lock to change that if you know what you're doing."
     end 2
 end if
 
@@ -119,6 +119,7 @@ case "remove"
         print #ff, ""
     next
     close #ff
+    kill CACHE_DIR & "fbget.lock"
 case "list"
     showList(rcmd)
 case "search"

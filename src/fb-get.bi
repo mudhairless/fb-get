@@ -23,7 +23,6 @@
 #define MANF_DIR exepath & "/packages/"
 #define PLATFORM "win32"
 #define INST_DIR CONF_DIR
-#define RM "rm"
 #define BINDIR exepath & "/bin/win32/"
 #else
 #define PKG_LIST "/usr/local/etc/freebasic/packages.list"
@@ -33,7 +32,6 @@
 #define PLATFORM "linux"
 #define INST_DIR "/usr/local/"
 #define MANF_DIR "/usr/local/etc/freebasic/packages/"
-#define RM "del"
 #define BINDIR
 #endif
 
@@ -58,7 +56,7 @@
 
 #macro errorout(r,l)
 if r <> 0 then
-    print "ERROR: " & l
+    print "ERROR " & l & ": A subcommand failed to complete."
     end 42
 end if
 #endmacro

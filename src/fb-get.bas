@@ -37,8 +37,6 @@ function fbget_main ( ) as integer
 
     print "fb-get - FreeBASIC Package Installer"
 
-    print "Loading package information."
-
     if cmd = "clear-lock" then
         print "Clearing lock."
         end kill(CACHE_DIR & "fbget.lock")

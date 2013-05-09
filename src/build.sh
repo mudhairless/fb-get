@@ -1,1 +1,2 @@
-fbc -w all -m fb-get *.bas
+#!/bin/sh
+fbc -w all -x ../fb-get -m fb-get *.bas

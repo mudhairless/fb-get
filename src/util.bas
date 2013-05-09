@@ -19,6 +19,8 @@
 
 sub loadPackages( )
 
+    print "Loading package information."
+
     var ff = freefile
 
     if fileexists(PKG_LIST) then

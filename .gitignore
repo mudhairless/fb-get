@@ -2,3 +2,9 @@ gen/*
 fb-get
 fb-get.exe
 *.o
+src/gui/windows/fb-get-gui/bin
+src/gui/windows/fb-get-gui/obj
+*.user
+*.suo
+_ReSharper.*
+*.sln.cache

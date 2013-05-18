@@ -89,6 +89,6 @@ function fbget_main ( ) as integer
         showhelp(rcmd)
         return 1
     end select
-
+    return 0
 end function
 

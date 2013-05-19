@@ -23,7 +23,7 @@ dim shared installed as package_list ptr
 var log_s = get_config("LOG_TO")
 if log_s <> "" then
     set_log_level(_DEBUG)
-    set_log_method(LOG_FILE,cast(zstring ptr,log_s))
+    set_log_method(LOG_FILE, strptr(log_s) )
     DEBUG("Program started.")
 end if
 var ret = fbget_main

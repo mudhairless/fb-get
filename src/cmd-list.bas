@@ -27,7 +27,7 @@ sub showList( byref opts as const string = "" )
         else
             FATAL("No available packages to list.")
         end if
-    else if opts = "-updates" then
+    elseif opts = "-updates" then
         if installed <> NULL then
             var curnode = installed->head
             while curnode <> NULL

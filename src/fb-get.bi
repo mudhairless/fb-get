@@ -15,36 +15,26 @@
 '    along with this program; if not, write to the Free Software
 '    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#define PKG_LIST CONF_DIR & "packages.list"
+#define INST_LIST CONF_DIR & "installed.list"
+#define CACHE_DIR get_config("CACHE_DIR")
+#define MANF_DIR get_config("MANIFEST_DIR")
+#define INST_DIR get_config("INSTALL_DIR")
+#define REMOTE_URL get_config("REMOTE_URL")
+
 #ifdef __FB_WIN32__
-#define PKG_LIST exepath & "\packages.list"
-#define INST_LIST exepath & "\installed.list"
-#define CACHE_DIR exepath & "\cache\"
-#define CONF_DIR exepath & "\"
-#define MANF_DIR exepath & "\packages\"
-#define PLATFORM "win32"
-#define INST_DIR CONF_DIR
-#define BINDIR exepath & "\bin\win32\"
-#define MK_DIR "mkdir "
-#define EXE_EXT ".exe"
+    #define PLATFORM "win32"
+    #define BINDIR CONF_DIR "bin\win32\"
+    #define MK_DIR "mkdir "
+    #define EXE_EXT ".exe"
+    #define CONF_DIR exepath & "\"
 #else
-#define PKG_LIST "/usr/local/etc/freebasic/packages.list"
-#define CONF_DIR "/usr/local/etc/freebasic/"
-#define INST_LIST "/usr/local/etc/freebasic/installed.list"
-#define CACHE_DIR "/var/cache/freebasic/"
-#define PLATFORM "linux"
-#define INST_DIR "/usr/local/"
-#define MANF_DIR "/usr/local/etc/freebasic/packages/"
-#define BINDIR
-#define MK_DIR "mkdir -p "
-#define EXE_EXT ""
+    #define PLATFORM "linux"
+    #define BINDIR
+    #define MK_DIR "mkdir -p "
+    #define EXE_EXT ""
+    #define CONF_DIR "/usr/local/etc/freebasic/"
 #endif
-
-
-#define REMOTE_URL "http://ext.freebasic.net/dist/" & PLATFORM & "/"
-'#define WGETCMD(packagen) BINDIR & "wget -q -O " & CACHE_DIR & packagen & ".zip" & " " & REMOTE_URL & packagen & ".zip"
-'#define UNZIPCMD(filen) BINDIR & "unzip -q -o -d . " & CACHE_DIR & filen
-'#define MANIFEST(filen) BINDIR & "unzip -l " & CACHE_DIR & filen & ".zip > " & MANF_DIR & filen & ".manifest"
-'#define GPGVCMD(filen) BINDIR & "gpgv -q --keyring " & CONF_DIR & "keyring.gpg " & CACHE_DIR & filen & ".zip.sign"
 
 #include once "vbcompat.bi"
 
@@ -57,13 +47,6 @@
 #ifndef NULL
     #define NULL 0
 #endif
-
-#macro errorout(r,l)
-if r <> 0 then
-    print "ERROR " & l & ": A subcommand failed to complete."
-    end 42
-end if
-#endmacro
 
 
 type package_desc

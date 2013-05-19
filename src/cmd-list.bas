@@ -21,11 +21,19 @@ declare sub printList( byval x as pnode ptr )
 
 sub showList( byref opts as const string = "" )
     if opts = "-all" then
-        print "Available packages:"
-        printList(available->head)
+        if available <> NULL then
+            print "Available packages:"
+            printList(available->head)
+        else
+            FATAL("No available packages to list.")
+        end if
     else
-        print "Installed packages:"
-        printList(installed->head)
+        if installed <> NULL then
+            print "Installed packages:"
+            printList(installed->head)
+        else
+            FATAL("There are no installed packages to list.")
+        end if
     end if
     print
 end sub

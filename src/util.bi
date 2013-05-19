@@ -40,6 +40,10 @@ declare function verify_file( byref sig_file as const string, byref key_f as con
 declare function unpack_files( byref f as const string, byref dest as const string ) as integer
 declare function generate_manifest( byref f as const string, byref dest as const string ) as integer
 
+''config utilities
+declare function get_config(byref k as string) as string
+declare sub set_config(byref k as string, byref v as string)
+
 ''string utilities
 declare function split (byref s as const string, result() as string, byref delimiter as const string, byval limit as integer) as integer
 

@@ -29,6 +29,7 @@ sub showhelp( byref hc as const string = "" )
     case "list"
         print "List all installed packages."
         print "use list -all to list available packages."
+        print "use list -updates to list only updated packages."
     case "search"
         print "Search for the specified string in the available package names."
     case else

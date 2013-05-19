@@ -27,6 +27,22 @@ sub showList( byref opts as const string = "" )
         else
             FATAL("No available packages to list.")
         end if
+    else if opts = "-updates" then
+        if installed <> NULL then
+            var curnode = installed->head
+            while curnode <> NULL
+                var ap = available->findItem(curnode->d._name)
+                if ap <> NULL then
+                    DEBUG("Package: " & curnode->d._name & " Remote: " & ap->version & " Local: " & curnode->d.version)
+                    if ap->version > curnode->d.version then
+                        print curnode->d._name & " " & ap->version & " (" & curnode->d.version & ")"
+                    end if
+                else
+                    INFO("Package is only available locally: " & curnode->d._name)
+                end if
+                curnode = curnode->n
+            wend
+        end if
     else
         if installed <> NULL then
             print "Installed packages:"

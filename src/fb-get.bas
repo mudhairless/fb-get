@@ -21,7 +21,9 @@ dim shared available as package_list ptr
 dim shared installed as package_list ptr
 
 var ret = fbget_main
+#ifndef __FB_WIN32__
 kill CACHE_DIR & "fbget.lock"
+#endif
 if available <> NULL then delete available
 if installed <> NULL then delete installed
 end ret
@@ -38,23 +40,25 @@ function fbget_main ( ) as integer
     print "fb-get - FreeBASIC Package Installer"
 
     if cmd = "clear-lock" then
-        print "Clearing lock."
+        WARN("Clearing lock.")
         end kill(CACHE_DIR & "fbget.lock")
     end if
-
+#ifndef __FB_WIN32__
     if not fileexists(CACHE_DIR & "fbget.lock") then
-        if open (CACHE_DIR & "fbget.lock", for output, as #1) <> 0 then
-            print "ERROR: unable to lock database, are you root or have write permissions?"
+    var ff = freefile
+        if open (CACHE_DIR & "fbget.lock", for output, as #ff) <> 0 then
+            FATAL("ERROR: unable to lock database, are you root or have write permissions?")
             end 2
         else
-            print #1, 1
-            close #1
+            print #ff, 1
+            close #ff
         end if
+        close #ff
     else
-        print "The package database is currently locked. Use clear-lock to change that if you know what you're doing."
+        FATAL("The package database is currently locked. Use clear-lock to change that if you know what you're doing.")
         end 2
     end if
-
+#endif
     loadPackages()
 
     var xcmd = lcase(command())
@@ -62,12 +66,18 @@ function fbget_main ( ) as integer
 
     select case cmd
     case "update"
-        print "Retrieving latest package list."
-        shell WGETCMD("packages.list")
-        shell WGETCMD("keyring.gpg")
-        chdir CONF_DIR
-        shell UNZIPCMD("packages.list.zip")
-        shell UNZIPCMD("keyring.gpg")
+        INFO("Retrieving latest package list.")
+        get_file(CACHE_DIR & "packages.list.zip","packages.list.zip")
+        get_file(CACHE_DIR & "packages.list.zip.sign","packages.list.zip.sign")
+        unpack_files(CACHE_DIR & "packages.list.zip",CACHE_DIR)
+        var v = verify_file(CACHE_DIR & "packages.list.zip.sign", CACHE_DIR & "keyring.gpg")
+        if v = 0 then
+            INFO("Package list verified.")
+            unpack_files(CACHE_DIR & "packages.list.zip",CONF_DIR)
+        else
+            FATAL("Unable to verify package list.")
+            end 30
+        end if
     case "install"
         installPackages( rcmd )
         var ff = freefile
@@ -92,3 +102,80 @@ function fbget_main ( ) as integer
     return 0
 end function
 
+sub loadPackages( )
+
+    INFO("Loading package information.")
+
+    var ff = freefile
+
+    if fileexists(PKG_LIST) then
+        if open(PKG_LIST, for binary, access read, as #ff) <> 0 then
+            WARN("Unable to read from package list.")
+            var cdrv = shell( "mkdir -p " & CONF_DIR )
+            if cdrv <> 0 then WARN(cdrv & ": Unable to create CONF_DIR")
+            cdrv = shell( "mkdir -p " & CACHE_DIR )
+            if cdrv <> 0 then WARN(cdrv & ": Unable to create CACHE_DIR")
+            return
+        else
+            var cur_line = ""
+            line input #ff, cur_line
+            var num_pkgs = valuint(cur_line)
+            INFO(num_pkgs & " packages in database.")
+            if available = NULL then
+                available = new package_list
+            end if
+            for n as uinteger = 0 to num_pkgs -1
+                dim curpkg as package_desc
+                line input #ff, curpkg._name
+                line input #ff, curpkg._desc
+                line input #ff, curpkg._depends
+                line input #ff, cur_line
+                curpkg.version = valuint(cur_line)
+                line input #ff, cur_line 'blank line seperating packages
+                available->addItem(curpkg)
+            next
+            close #ff
+        end if
+    else
+        WARN("Package list not available, please update.")
+        shell "mkdir -p " & MANF_DIR
+        var cdrv = shell( MK_DIR & CONF_DIR )
+            if cdrv <> 0 then WARN( cdrv & ": Unable to create CONF_DIR")
+            cdrv = shell( MK_DIR & CACHE_DIR )
+            if cdrv <> 0 then WARN( cdrv & ": Unable to create CACHE_DIR")
+        return
+    end if
+
+    ff = freefile
+
+    if fileexists(INST_LIST) then
+        if open(INST_LIST, for binary, access read, as #ff) <> 0 then
+            WARN("Unable to read from package list.")
+            return
+        else
+            var cur_line = ""
+            line input #ff, cur_line
+            var num_pkgs = valuint(cur_line)
+            INFO(num_pkgs & " packages currently installed.")
+            if installed = NULL then
+                installed = new package_list
+            end if
+            for n as uinteger = 0 to num_pkgs -1
+                dim curpkg as package_desc
+                line input #ff, curpkg._name
+                line input #ff, curpkg._desc
+                line input #ff, curpkg._depends
+                line input #ff, cur_line
+                curpkg.version = valuint(cur_line)
+                line input #ff, cur_line 'blank line seperating packages
+                installed->addItem(curpkg)
+            next
+            close #ff
+        end if
+    else
+        INFO("No packages installed.")
+    end if
+
+    close
+
+end sub

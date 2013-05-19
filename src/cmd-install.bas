@@ -26,26 +26,24 @@ sub install( byref pkgname as string )
             if apkg->_depends <> "none" then
                 installPackages( apkg->_depends )
             end if
-            print "Installing " & pkgname
-            var ret = shell (WGETCMD(pkgname))
-            errorout(ret,__LINE__)
-            ret = shell (WGETCMD(pkgname & ".sign"))
-            errorout(ret,__LINE__)
-            ret = name(CACHE_DIR & pkgname & ".sign" & ".zip", CACHE_DIR & pkgname & ".zip" & ".sign")
-            errorout(ret,__LINE__)
-            ret = shell( GPGVCMD(pkgname) )
-            errorout(ret,__LINE__)
-            chdir INST_DIR
-            ret = shell (UNZIPCMD(pkgname & ".zip"))
-            errorout(ret,__LINE__)
-            shell MANIFEST(pkgname)
+            INFO("Installing " & pkgname)
+            var ret = get_file(CACHE_DIR & pkgname & ".zip", pkgname & ".zip")
+            DEBUG("Get: " & pkgname & " (" & ret & ")")
+            ret = get_file(CACHE_DIR & pkgname & ".zip.sign", pkgname & ".zip.sign")
+            DEBUG("Get: " & pkgname & " signature (" & ret & ")")
+            ret = verify_file(CACHE_DIR & pkgname & ".zip.sign", CONF_DIR & "keyring.gpg")
+            DEBUG("Verify: " & pkgname & " (" & ret & ")")
+            ret = unpack_files(CACHE_DIR & pkgname & ".zip", INST_DIR)
+            DEBUG("Unpack: " & pkgname & " (" & ret & ")")
+            ret = generate_manifest(CACHE_DIR & pkgname & ".zip", MANF_DIR & pkgname & ".manifest")
+            DEBUG("Manifest: " & pkgname & " (" & ret & ")")
             installed->addItem( *apkg )
             return
         else
-            print "INFO: " & pkgname & " is already installed."
+            INFO(pkgname & " is already installed.")
         end if
     else
-        print "ERROR: " & pkgname & " was not found in the database."
+        FATAL(pkgname & " was not found in the database.")
         end 4
     end if
 end sub

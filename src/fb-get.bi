@@ -16,14 +16,16 @@
 '    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #ifdef __FB_WIN32__
-#define PKG_LIST exepath & "/packages.list"
-#define INST_LIST exepath & "/installed.list"
-#define CACHE_DIR exepath & "/cache/"
-#define CONF_DIR exepath & "/"
-#define MANF_DIR exepath & "/packages/"
+#define PKG_LIST exepath & "\packages.list"
+#define INST_LIST exepath & "\installed.list"
+#define CACHE_DIR exepath & "\cache\"
+#define CONF_DIR exepath & "\"
+#define MANF_DIR exepath & "\packages\"
 #define PLATFORM "win32"
 #define INST_DIR CONF_DIR
-#define BINDIR exepath & "/bin/win32/"
+#define BINDIR exepath & "\bin\win32\"
+#define MK_DIR "mkdir "
+#define EXE_EXT ".exe"
 #else
 #define PKG_LIST "/usr/local/etc/freebasic/packages.list"
 #define CONF_DIR "/usr/local/etc/freebasic/"
@@ -33,14 +35,16 @@
 #define INST_DIR "/usr/local/"
 #define MANF_DIR "/usr/local/etc/freebasic/packages/"
 #define BINDIR
+#define MK_DIR "mkdir -p "
+#define EXE_EXT ""
 #endif
 
 
 #define REMOTE_URL "http://ext.freebasic.net/dist/" & PLATFORM & "/"
-#define WGETCMD(packagen) BINDIR & "wget -q -O " & CACHE_DIR & packagen & ".zip" & " " & REMOTE_URL & packagen & ".zip"
-#define UNZIPCMD(filen) BINDIR & "unzip -q -o -d . " & CACHE_DIR & filen
-#define MANIFEST(filen) BINDIR "unzip -l " & CACHE_DIR & filen & ".zip > " & MANF_DIR & filen & ".manifest"
-#define GPGVCMD(filen) BINDIR "gpgv -q --keyring " & CONF_DIR & "keyring.gpg " & CACHE_DIR & filen & ".zip.sign"
+'#define WGETCMD(packagen) BINDIR & "wget -q -O " & CACHE_DIR & packagen & ".zip" & " " & REMOTE_URL & packagen & ".zip"
+'#define UNZIPCMD(filen) BINDIR & "unzip -q -o -d . " & CACHE_DIR & filen
+'#define MANIFEST(filen) BINDIR & "unzip -l " & CACHE_DIR & filen & ".zip > " & MANF_DIR & filen & ".manifest"
+'#define GPGVCMD(filen) BINDIR & "gpgv -q --keyring " & CONF_DIR & "keyring.gpg " & CACHE_DIR & filen & ".zip.sign"
 
 #include once "vbcompat.bi"
 
@@ -89,7 +93,6 @@ end type
 extern available as package_list ptr
 extern installed as package_list ptr
 
-declare function split (byref s as const string, result() as string, byref delimiter as const string, byval limit as integer) as integer
 declare sub showHelp( byref hc as const string = "" )
 declare sub loadPackages( )
 declare sub showList( byref opts as const string = "" )
@@ -97,3 +100,5 @@ declare sub installPackages( byref p as string )
 declare sub removePackages( byref p as string )
 declare function fbget_main ( ) as integer
 declare sub doSearch( byref rcmd as const string )
+
+#include once "util.bi"

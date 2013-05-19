@@ -34,7 +34,7 @@ end constructor
 
 dim shared g_config() as config_
 
-#define MAX_CONFIG 4
+#define MAX_CONFIG 5
 
 sub __init_config() constructor
 
@@ -44,6 +44,7 @@ sub __init_config() constructor
     g_config(1) = type<config_>("MANIFEST_DIR","")
     g_config(2) = type<config_>("INSTALL_DIR","")
     g_config(3) = type<config_>("REMOTE_URL","")
+    g_config(4) = type<config_>("LOG_TO","")
 
     'load defaults
     #ifdef __FB_WIN32__

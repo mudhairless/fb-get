@@ -20,12 +20,19 @@
 dim shared available as package_list ptr
 dim shared installed as package_list ptr
 
+var log_s = get_config("LOG_TO")
+if log_s <> "" then
+    set_log_level(_DEBUG)
+    set_log_method(LOG_FILE,cast(zstring ptr,log_s))
+    DEBUG("Program started.")
+end if
 var ret = fbget_main
 #ifndef __FB_WIN32__
 kill CACHE_DIR & "fbget.lock"
 #endif
 if available <> NULL then delete available
 if installed <> NULL then delete installed
+DEBUG("Program complete.")
 end ret
 
 function fbget_main ( ) as integer
@@ -66,7 +73,8 @@ function fbget_main ( ) as integer
 
     select case cmd
     case "update"
-        INFO("Retrieving latest package list.")
+        print "Retrieving latest package list."
+        DEBUG("Update requested.")
         get_file(CACHE_DIR & "packages.list.zip","packages.list.zip")
         get_file(CACHE_DIR & "packages.list.zip.sign","packages.list.zip.sign")
         unpack_files(CACHE_DIR & "packages.list.zip",CACHE_DIR)
@@ -79,12 +87,14 @@ function fbget_main ( ) as integer
             end 30
         end if
     case "install"
+        DEBUG("Install of package(s): " & rcmd & " requested.")
         installPackages( rcmd )
         var ff = freefile
         open INST_LIST FOR OUTPUT ACCESS WRITE AS #ff
         installed->writeTofile(ff)
         close #ff
     case "remove"
+        DEBUG("Removal of package(s): " & rcmd & " requested.")
         removePackages(rcmd)
         var ff = freefile
         open INST_LIST FOR OUTPUT ACCESS WRITE AS #ff
@@ -92,10 +102,13 @@ function fbget_main ( ) as integer
         close #ff
         kill CACHE_DIR & "fbget.lock"
     case "list"
+        DEBUG("Package listing requested.")
         showList(rcmd)
     case "search"
+        DEBUG("Search requested.")
         doSearch(rcmd)
     case else
+        DEBUG("Showing help.")
         showhelp(rcmd)
         return 1
     end select
@@ -104,7 +117,7 @@ end function
 
 sub loadPackages( )
 
-    INFO("Loading package information.")
+    print "Loading package information."
 
     var ff = freefile
 

@@ -1,7 +1,7 @@
 #ifndef __FB_GET_UTIL_BI__
 #define __FB_GET_UTIL_BI__ 1
 
-''log
+''log module is based on BSD licensed code.
 enum LOGLEVEL
     _DEBUG
     _INFO

@@ -29,14 +29,34 @@ function install( byval pkg as package_desc ptr ) as integer
     INFO("Installing " & pkgname)
     var ret = get_file(CACHE_DIR & pkgname & ".zip", pkgname & ".zip")
     DEBUG("Get: " & pkgname & " (" & ret & ")")
+    if ret <> 0 then
+        FATAL("Unable to retrieve package: " & pkgname)
+        return TRUE
+    end if
     ret = get_file(CACHE_DIR & pkgname & ".zip.sign", pkgname & ".zip.sign")
     DEBUG("Get: " & pkgname & " signature (" & ret & ")")
+    if ret <> 0 then
+        FATAL("Unable to retrieve package signature for: " & pkgname)
+        return TRUE
+    end if
     ret = verify_file(CACHE_DIR & pkgname & ".zip.sign", CONF_DIR & "keyring.gpg")
     DEBUG("Verify: " & pkgname & " (" & ret & ")")
+    if ret <> 0 then
+        FATAL("Unable to verify package: " & pkgname)
+        return TRUE
+    end if
     ret = unpack_files(CACHE_DIR & pkgname & ".zip", INST_DIR)
     DEBUG("Unpack: " & pkgname & " (" & ret & ")")
+    if ret <> 0 then
+        FATAL("Unable to unpack package: " & pkgname)
+        return TRUE
+    end if
     ret = generate_manifest(CACHE_DIR & pkgname & ".zip", MANF_DIR & pkgname & ".manifest")
     DEBUG("Manifest: " & pkgname & " (" & ret & ")")
+    if ret <> 0 then
+        FATAL("Unable to generate manifest package: " & pkgname & ". The package is installed but most likely in an inconsistent state and cannot be uninstalled with this tool.")
+        return TRUE
+    end if
     installed->addItem( *pkg )
     return FALSE
 

@@ -17,44 +17,65 @@
 
 #include once "fb-get.bi"
 
-sub install( byref pkgname as string )
+function install( byval pkg as package_desc ptr ) as integer
 
-    var apkg = available->findItem(pkgname)
-    if apkg <> NULL then
-        if installed->findItem(pkgname) = NULL then
-            'not already installed, let's do this
-            if apkg->_depends <> "none" then
-                installPackages( apkg->_depends )
-            end if
-            INFO("Installing " & pkgname)
-            var ret = get_file(CACHE_DIR & pkgname & ".zip", pkgname & ".zip")
-            DEBUG("Get: " & pkgname & " (" & ret & ")")
-            ret = get_file(CACHE_DIR & pkgname & ".zip.sign", pkgname & ".zip.sign")
-            DEBUG("Get: " & pkgname & " signature (" & ret & ")")
-            ret = verify_file(CACHE_DIR & pkgname & ".zip.sign", CONF_DIR & "keyring.gpg")
-            DEBUG("Verify: " & pkgname & " (" & ret & ")")
-            ret = unpack_files(CACHE_DIR & pkgname & ".zip", INST_DIR)
-            DEBUG("Unpack: " & pkgname & " (" & ret & ")")
-            ret = generate_manifest(CACHE_DIR & pkgname & ".zip", MANF_DIR & pkgname & ".manifest")
-            DEBUG("Manifest: " & pkgname & " (" & ret & ")")
-            installed->addItem( *apkg )
-            return
-        else
-            INFO(pkgname & " is already installed.")
-        end if
-    else
-        FATAL(pkgname & " was not found in the database.")
-        end 4
+    if pkg = NULL then
+        FATAL("The package pointer passed to the install function turned out to be null.")
+        return TRUE
     end if
-end sub
+
+    var pkgname = pkg->_name
+
+    INFO("Installing " & pkgname)
+    var ret = get_file(CACHE_DIR & pkgname & ".zip", pkgname & ".zip")
+    DEBUG("Get: " & pkgname & " (" & ret & ")")
+    ret = get_file(CACHE_DIR & pkgname & ".zip.sign", pkgname & ".zip.sign")
+    DEBUG("Get: " & pkgname & " signature (" & ret & ")")
+    ret = verify_file(CACHE_DIR & pkgname & ".zip.sign", CONF_DIR & "keyring.gpg")
+    DEBUG("Verify: " & pkgname & " (" & ret & ")")
+    ret = unpack_files(CACHE_DIR & pkgname & ".zip", INST_DIR)
+    DEBUG("Unpack: " & pkgname & " (" & ret & ")")
+    ret = generate_manifest(CACHE_DIR & pkgname & ".zip", MANF_DIR & pkgname & ".manifest")
+    DEBUG("Manifest: " & pkgname & " (" & ret & ")")
+    installed->addItem( *pkg )
+    return FALSE
+
+end function
+
+private function generate_install_list( byref p as string ) as integer
+
+    if changes = NULL then changes = new package_list
+
+    dim cmdline() as string
+    split(p,cmdline()," ",0)
+
+    for n as uinteger = 0 to ubound(cmdline)
+        var curpkgp = available->findItem(cmdline(n))
+        if curpkgp = NULL then
+            FATAL(cmdline(n) & " was not found in the database.")
+            return TRUE
+        end if
+        if installed->findItem(cmdline(n)) <> NULL then
+            INFO( cmdline(n) & " is already installed." )
+        else
+            if curpkgp->_depends <> "none" andalso curpkgp->_depends <> "" then
+                var ret = generate_install_list(curpkgp->_depends)
+                if ret = TRUE then return TRUE
+            end if
+            var curpkg = *curpkgp
+            changes->addItem(curpkg)
+        end if
+    next
+
+    return FALSE
+
+end function
 
 sub installPackages( byref p as string )
 
-    dim toinstall() as string
-    split(p,toinstall()," ",0)
-
-    for n as uinteger = 0 to ubound(toinstall)
-        install(toinstall(n))
-    next
+    INFO("Checking dependencies...")
+    if generate_install_list(p) = TRUE then end 4
+    INFO("Processing requested changes...")
+    if changes->iter(@install) = TRUE then end 37
 
 end sub

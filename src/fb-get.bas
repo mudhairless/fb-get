@@ -19,6 +19,7 @@
 
 dim shared available as package_list ptr
 dim shared installed as package_list ptr
+dim shared changes as package_list ptr
 
 var log_s = get_config("LOG_TO")
 if log_s <> "" then
@@ -32,6 +33,7 @@ kill CACHE_DIR & "fbget.lock"
 #endif
 if available <> NULL then delete available
 if installed <> NULL then delete installed
+if changes <> NULL then delete changes
 DEBUG("Program complete.")
 end ret
 

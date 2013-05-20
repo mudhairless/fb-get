@@ -71,6 +71,8 @@ type pnode
     declare destructor()
 end type
 
+type pack_iter as function ( byval as package_desc ptr ) as integer
+
 type package_list
     public:
     declare sub addItem( byref x as package_desc )
@@ -78,6 +80,7 @@ type package_list
     declare function findItem( byref n as const string ) as package_desc ptr
     declare destructor()
     declare sub writeToFile( byval ff as integer )
+    declare function iter( byval as pack_iter ) as integer
     'private:
     head as pnode ptr
     tail as pnode ptr
@@ -86,6 +89,7 @@ end type
 
 extern available as package_list ptr
 extern installed as package_list ptr
+extern changes as package_list ptr
 
 declare sub showHelp( byref hc as const string = "" )
 declare sub loadPackages( )

@@ -17,6 +17,21 @@
 
 #include once "fb-get.bi"
 
+function package_list.iter( byval f as pack_iter ) as integer
+
+    var curnode = head
+    while curnode <> NULL
+        var ret = f(@(curnode->d))
+        if ret = TRUE then
+            DEBUG("Package List Iterator returned TRUE")
+            return TRUE
+        end if
+        curnode = curnode->n
+    wend
+
+    return FALSE
+end function
+
 sub package_list.addItem( byref x as package_desc )
     if findItem(x._name) = NULL then
         if tail = NULL then

@@ -44,6 +44,11 @@ function fbget_main ( ) as integer
         return 1
     end if
 
+    if cmd = "--version" orelse cmd = "-version" then
+    print COPYRIGHT
+    end 0
+    end if
+
     print "fb-get - FreeBASIC Package Installer"
 
     if cmd = "clear-lock" then

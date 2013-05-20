@@ -33,7 +33,7 @@ sub showhelp( byref hc as const string = "" )
     case "search"
         print "Search for the specified string in the available package names."
     case else
-        print "Usage: fb-get update|install [package]|remove [package]|list|search"
+        print "Usage: fb-get --version|update|install [package]|remove [package]|list|search"
     end select
 
     print

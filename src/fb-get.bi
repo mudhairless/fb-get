@@ -38,6 +38,17 @@
 
 #include once "vbcompat.bi"
 
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 5
+#define VERSION_PATCH 0
+#define VERSION_I (VERSION_MAJOR << 24) or (VERSION_MINOR << 16) or (VERSION_PATCH)
+#define VERSION_STRING VERSION_MAJOR & "." & VERSION_MINOR & "." & VERSION_PATCH
+#define COPYRIGHT "FreeBASIC Package Manager (" & VERSION_STRING & !")\n" & _
+                !"Copyright (c) 2013 Ebben Feagan\n" & _
+                !"This is free software.  You may redistribute copies of it under the terms of\n" & _
+                !"the GNU General Public License <http://www.gnu.org/licenses/gpl.html>.\n" & _
+                !"There is NO WARRANTY, to the extent permitted by law.\n"
+
 #ifndef FALSE
     #define FALSE 0
 #endif

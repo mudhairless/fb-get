@@ -26,6 +26,8 @@ if log_s <> "" then
     set_log_level(_DEBUG)
     set_log_method(LOG_FILE, strptr(log_s) )
     DEBUG("Program started.")
+else
+    set_log_level(_WARN)
 end if
 var ret = fbget_main
 #ifndef __FB_WIN32__

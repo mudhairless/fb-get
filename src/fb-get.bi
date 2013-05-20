@@ -99,4 +99,7 @@ declare sub removePackages( byref p as string )
 declare function fbget_main ( ) as integer
 declare sub doSearch( byref rcmd as const string )
 
+'used by upgrade and list commands
+declare function build_updates_list ( byval p as package_desc ptr ) as integer
+
 #include once "util.bi"

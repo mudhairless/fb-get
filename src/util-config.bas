@@ -84,8 +84,8 @@ sub __init_config() constructor
             end if
         next
         wend
+        close #ff
     end if
-    close #ff
 
 end sub
 

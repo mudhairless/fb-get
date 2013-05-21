@@ -73,7 +73,6 @@ function fbget_main ( ) as integer
             print #ff, 1
             close #ff
         end if
-        close #ff
     else
         FATAL("The package database is currently locked. Use clear-lock to change that if you know what you're doing.")
         end 2

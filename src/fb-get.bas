@@ -42,9 +42,12 @@ end ret
 function fbget_main ( ) as integer
 
     var cmd = lcase(command(1))
-    if cmd = "" then
+    var xcmd = lcase(command())
+    var rcmd = right(xcmd,len(xcmd)-len(cmd)-1)
+
+    if cmd = "" orelse cmd = "help" orelse cmd = "halp" then
         print "fb-get - FreeBASIC Package Installer"
-        showHelp()
+        showHelp(rcmd)
         return 1
     end if
 
@@ -76,9 +79,6 @@ function fbget_main ( ) as integer
     end if
 #endif
     loadPackages()
-
-    var xcmd = lcase(command())
-    var rcmd = right(xcmd,len(xcmd)-len(cmd)-1)
 
     select case cmd
     case "update"

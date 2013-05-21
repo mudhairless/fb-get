@@ -30,7 +30,7 @@
     #define CONF_DIR exepath & "\"
 #else
     #define PLATFORM "linux"
-    #define BINDIR
+    #define BINDIR ""
     #define MK_DIR "mkdir -p "
     #define EXE_EXT ""
     #define CONF_DIR "/usr/local/etc/freebasic/"

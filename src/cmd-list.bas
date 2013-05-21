@@ -38,13 +38,14 @@ private function print_updates_list ( byval p as package_desc ptr ) as integer
     return FALSE
 end function
 
-sub showList( byref opts as const string = "" )
+function showList( byref opts as const string = "" ) as integer
     if opts = "-all" then
         if available <> NULL then
             print "Available packages:"
             available->iter(@printList)
         else
             FATAL("No available packages to list.")
+            return 47
         end if
     elseif opts = "-updates" then
         if changes = NULL then changes = new package_list
@@ -56,12 +57,14 @@ sub showList( byref opts as const string = "" )
         if installed <> NULL then
             print "Installed packages:"
             installed->iter(@printList)
+            print
         else
             FATAL("There are no installed packages to list.")
+            return 62
         end if
     end if
-    print
-end sub
+    return FALSE
+end function
 
 function printList( byval x as package_desc ptr ) as integer
     print x->_name

@@ -71,10 +71,12 @@ private function generate_install_list( byref p as string ) as integer
 
     for n as uinteger = 0 to ubound(cmdline)
         var curpkgp = available->findItem(cmdline(n))
+
         if curpkgp = NULL then
             FATAL(cmdline(n) & " was not found in the database.")
             return TRUE
         end if
+
         if installed->findItem(cmdline(n)) <> NULL then
             INFO( cmdline(n) & " is already installed." )
         else
@@ -91,11 +93,13 @@ private function generate_install_list( byref p as string ) as integer
 
 end function
 
-sub installPackages( byref p as string )
+function installPackages( byref p as string ) as integer
 
     INFO("Checking dependencies...")
-    if generate_install_list(p) = TRUE then end 4
+    if generate_install_list(p) = TRUE then return 4
     INFO("Processing requested changes...")
-    if changes->iter(@install) = TRUE then end 37
+    if changes->iter(@install) = TRUE then return 37
 
-end sub
+    return FALSE
+
+end function

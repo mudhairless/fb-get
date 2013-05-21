@@ -17,6 +17,19 @@
 
 #include once "fb-get.bi"
 
+'' :::::
+Sub Replace (subject As String, oldtext As const String, newtext As const String)
+  'replaces all occurances of oldtext in subject with newtext
+  Dim As Integer n
+  If subject <> "" And oldtext <> "" And oldtext <> newtext Then
+    n = Instr(subject, oldtext)
+    Do While n <> 0
+      subject = Left(subject,n-1) & newtext & Right(subject,Len(subject)- n - Len(oldtext)+ 1)
+      n = Instr(n + Len(newtext),subject, oldtext)
+    Loop
+  End if
+End Sub
+
     '' :::::
     function split (byref s as const string, result() as string, byref delimiter as const string, byval limit as integer) as integer
 

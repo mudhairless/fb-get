@@ -66,5 +66,6 @@ declare sub set_config(byref k as string, byref v as string)
 
 ''string utilities
 declare function split (byref s as const string, result() as string, byref delimiter as const string, byval limit as integer) as integer
+declare Sub Replace (subject As String, oldtext As const String, newtext As const String)
 
 #endif

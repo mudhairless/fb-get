@@ -70,18 +70,28 @@ sub package_list.removeItem( byref n as const string )
     wend
 end sub
 
-sub package_list.writeToFile( byval ff as integer )
-    print #ff, cnt
-    var curnode = head
-    while curnode <> NULL
-        print #ff, curnode->d._name
-        print #ff, curnode->d._desc
-        print #ff, curnode->d._depends
-        print #ff, curnode->d.version
-        print #ff, ""
-        curnode = curnode->n
-    wend
-end sub
+dim shared fnum as integer
+
+private function fpr ( byval x as package_desc ptr ) as integer
+    print #fnum, x->_name
+    print #fnum, x->_desc
+    print #fnum, x->_depends
+    print #fnum, x->version
+    print #fnum, ""
+
+    return false
+end function
+
+function package_list.writeToFile( byref fname as const string ) as integer
+    var fnum = freefile
+    var ret = open(fname,for output,access write,as #fnum)
+    if ret = 0 then
+        print #fnum, cnt
+        this.iter(@fpr)
+        close #fnum
+    end if
+    return ret
+end function
 
 function package_list.findItem( byref n as const string ) as package_desc ptr
     var curnode = head

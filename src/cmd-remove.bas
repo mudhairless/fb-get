@@ -105,18 +105,20 @@ private function analyze_removals ( byval p as package_desc ptr ) as integer
     return FALSE
 end function
 
-sub removePackages( byref p as string )
+function removePackages( byref p as string ) as integer
     fbflag = FALSE
     if instr(p,"fbc") then fbflag = TRUE
     INFO("Analyzing dependencies for packages to be removed.")
-    if generate_remove_list(p) = TRUE then end 5
+    if generate_remove_list(p) = TRUE then return 5
     while changes->iter(@analyze_removals) = TRUE : wend
 
     if changes->cnt > 0 then
         INFO("Removing packages.")
-        if changes->iter(@remove) = TRUE then end 38
+        if changes->iter(@remove) = TRUE then return 38
     else
         WARN("After analysis no packages are being removed due to dependencies.")
     end if
 
-end sub
+    return FALSE
+
+end function

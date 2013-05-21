@@ -27,7 +27,7 @@ if log_s <> "" then
     set_log_method(LOG_FILE, strptr(log_s) )
     DEBUG("Program started.")
 else
-    set_log_level(_WARN)
+    set_log_level(_INFO)
 end if
 var ret = fbget_main
 #ifndef __FB_WIN32__
@@ -58,11 +58,12 @@ function fbget_main ( ) as integer
 
     print "fb-get - FreeBASIC Package Installer"
 
+    #ifndef __FB_WIN32__
     if cmd = "clear-lock" then
         WARN("Clearing lock.")
         end kill(CACHE_DIR & "fbget.lock")
     end if
-#ifndef __FB_WIN32__
+
     if not fileexists(CACHE_DIR & "fbget.lock") then
     var ff = freefile
         if open (CACHE_DIR & "fbget.lock", for output, as #ff) <> 0 then
@@ -77,51 +78,42 @@ function fbget_main ( ) as integer
         FATAL("The package database is currently locked. Use clear-lock to change that if you know what you're doing.")
         end 2
     end if
-#endif
-    loadPackages()
+    #endif
 
+    loadPackages()
+    var ret = FALSE
     select case cmd
     case "update"
-        print "Retrieving latest package list."
-        DEBUG("Update requested.")
-        get_file(CACHE_DIR & "packages.list.zip","packages.list.zip")
-        get_file(CACHE_DIR & "packages.list.zip.sign","packages.list.zip.sign")
-        unpack_files(CACHE_DIR & "packages.list.zip",CACHE_DIR)
-        var v = verify_file(CACHE_DIR & "packages.list.zip.sign", CACHE_DIR & "keyring.gpg")
-        if v = 0 then
-            INFO("Package list verified.")
-            unpack_files(CACHE_DIR & "packages.list.zip",CONF_DIR)
-        else
-            FATAL("Unable to verify package list.")
-            end 30
-        end if
+        ret = updatePackageList(rcmd)
+
     case "install"
         DEBUG("Install of package(s): " & rcmd & " requested.")
-        installPackages( rcmd )
-        var ff = freefile
-        open INST_LIST FOR OUTPUT ACCESS WRITE AS #ff
-        installed->writeTofile(ff)
-        close #ff
+        ret = installPackages( rcmd )
+        if ret = FALSE then
+            ret = installed->writeTofile(INST_LIST)
+        end if
+
     case "remove"
         DEBUG("Removal of package(s): " & rcmd & " requested.")
-        removePackages(rcmd)
-        var ff = freefile
-        open INST_LIST FOR OUTPUT ACCESS WRITE AS #ff
-        installed->writetoFile(ff)
-        close #ff
-        kill CACHE_DIR & "fbget.lock"
+        ret = removePackages(rcmd)
+        if ret = FALSE then
+            ret = installed->writeTofile(INST_LIST)
+        end if
+
     case "list"
         DEBUG("Package listing requested.")
-        showList(rcmd)
+        ret = showList(rcmd)
+
     case "search"
         DEBUG("Search requested.")
         doSearch(rcmd)
+
     case else
         DEBUG("Showing help.")
         showhelp(rcmd)
-        return 1
+        ret = 1
     end select
-    return 0
+    return ret
 end function
 
 sub loadPackages( )
@@ -169,7 +161,7 @@ sub loadPackages( )
     end if
 
     ff = freefile
-
+    installed = new package_list
     if fileexists(INST_LIST) then
         if open(INST_LIST, for binary, access read, as #ff) <> 0 then
             WARN("Unable to read from package list.")

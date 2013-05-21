@@ -60,7 +60,7 @@ sub __init_config() constructor
 
     var ff = freefile
     if open( CONF_DIR & "fb-get.conf", for binary, access read, as #ff) = 0 then
-
+        print "config loading"
         'we found a config file let's load it up
         'config files are really simple:
         '*BEGIN CONFIG FILE EXAMPLE NEXT LINE

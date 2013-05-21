@@ -61,8 +61,8 @@
 
 
 type package_desc
-    as string _name, _desc, _depends
-    as uinteger version
+    as string _name, _sdesc, _desc, _depends
+    as uinteger version, size
 end type
 
 type pnode
@@ -79,7 +79,7 @@ type package_list
     declare sub removeItem( byref n as const string )
     declare function findItem( byref n as const string ) as package_desc ptr
     declare destructor()
-    declare sub writeToFile( byval ff as integer )
+    declare function writeToFile( byref fname as const string ) as integer
     declare function iter( byval as pack_iter ) as integer
     'private:
     head as pnode ptr
@@ -93,9 +93,10 @@ extern changes as package_list ptr
 
 declare sub showHelp( byref hc as const string = "" )
 declare sub loadPackages( )
-declare sub showList( byref opts as const string = "" )
-declare sub installPackages( byref p as string )
-declare sub removePackages( byref p as string )
+declare function updatePackageList( byref opts as const string ) as integer
+declare function showList( byref opts as const string = "" ) as integer
+declare function installPackages( byref p as string ) as integer
+declare function removePackages( byref p as string ) as integer
 declare function fbget_main ( ) as integer
 declare sub doSearch( byref rcmd as const string )
 

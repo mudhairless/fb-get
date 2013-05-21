@@ -79,6 +79,7 @@ type package_list
     declare sub removeItem( byref n as const string )
     declare function findItem( byref n as const string ) as package_desc ptr
     declare destructor()
+    declare function readFromFile( byref fname as const string ) as integer
     declare function writeToFile( byref fname as const string ) as integer
     declare function iter( byval as pack_iter ) as integer
     'private:
@@ -92,7 +93,7 @@ extern installed as package_list ptr
 extern changes as package_list ptr
 
 declare sub showHelp( byref hc as const string = "" )
-declare sub loadPackages( )
+declare function loadPackages( ) as integer
 declare function updatePackageList( byref opts as const string ) as integer
 declare function showList( byref opts as const string = "" ) as integer
 declare function installPackages( byref p as string ) as integer

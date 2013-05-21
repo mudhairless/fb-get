@@ -82,6 +82,28 @@ private function fpr ( byval x as package_desc ptr ) as integer
     return false
 end function
 
+function package_list.readFromFile( byref fname as const string ) as integer
+    var fnum = freefile
+    var ret = open(fname,for binary,access read,as #fnum)
+    if ret = 0 then
+        var curline = ""
+        line input #fnum, curline
+        var pcnt = valuint(curline)
+        for n as uinteger = 0 to pcnt -1
+                dim curpkg as package_desc
+                line input #fnum, curpkg._name
+                line input #fnum, curpkg._desc
+                line input #fnum, curpkg._depends
+                line input #fnum, curline
+                curpkg.version = valuint(curline)
+                line input #fnum, curline 'blank line seperating packages
+                this.addItem(curpkg)
+            next
+        close #fnum
+    end if
+    return ret
+end function
+
 function package_list.writeToFile( byref fname as const string ) as integer
     var fnum = freefile
     var ret = open(fname,for output,access write,as #fnum)

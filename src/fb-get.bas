@@ -80,8 +80,9 @@ function fbget_main ( ) as integer
     end if
     #endif
 
-    loadPackages()
-    var ret = FALSE
+    var ret = loadPackages()
+    if ret <> FALSE then return ret
+
     select case cmd
     case "update"
         ret = updatePackageList(rcmd)
@@ -116,80 +117,68 @@ function fbget_main ( ) as integer
     return ret
 end function
 
-sub loadPackages( )
+function loadPackages( ) as integer
 
     print "Loading package information."
 
     var ff = freefile
+    var ret = 0
 
+    if available = NULL then available = new package_list
     if fileexists(PKG_LIST) then
-        if open(PKG_LIST, for binary, access read, as #ff) <> 0 then
+        ret = available->readFromFile(PKG_LIST)
+        if ret <> FALSE then
             WARN("Unable to read from package list.")
-            var cdrv = shell( "mkdir -p " & CONF_DIR )
-            if cdrv <> 0 then WARN(cdrv & ": Unable to create CONF_DIR")
-            cdrv = shell( "mkdir -p " & CACHE_DIR )
-            if cdrv <> 0 then WARN(cdrv & ": Unable to create CACHE_DIR")
-            return
-        else
-            var cur_line = ""
-            line input #ff, cur_line
-            var num_pkgs = valuint(cur_line)
-            INFO(num_pkgs & " packages in database.")
-            if available = NULL then
-                available = new package_list
+            ret = shell( MK_DIR & MANF_DIR )
+            if ret <> 0 then
+                WARN(ret & ": Unable to create MANF_DIR")
+                return ret
             end if
-            for n as uinteger = 0 to num_pkgs -1
-                dim curpkg as package_desc
-                line input #ff, curpkg._name
-                line input #ff, curpkg._desc
-                line input #ff, curpkg._depends
-                line input #ff, cur_line
-                curpkg.version = valuint(cur_line)
-                line input #ff, cur_line 'blank line seperating packages
-                available->addItem(curpkg)
-            next
-            close #ff
+            ret = shell( MK_DIR & CONF_DIR )
+            if ret <> 0 then
+                WARN(ret & ": Unable to create CONF_DIR")
+                return ret
+            end if
+            ret = shell( "mkdir -p " & CACHE_DIR )
+            if ret <> 0 then
+                WARN(ret & ": Unable to create CACHE_DIR")
+                return ret
+            end if
+            return ret
         end if
+        INFO("Found " & available->cnt & " packages.")
     else
         WARN("Package list not available, please update.")
-        shell "mkdir -p " & MANF_DIR
-        var cdrv = shell( MK_DIR & CONF_DIR )
-            if cdrv <> 0 then WARN( cdrv & ": Unable to create CONF_DIR")
-            cdrv = shell( MK_DIR & CACHE_DIR )
-            if cdrv <> 0 then WARN( cdrv & ": Unable to create CACHE_DIR")
-        return
+        WARN("Unable to read from package list.")
+            ret = shell( MK_DIR & MANF_DIR )
+            if ret <> 0 then
+                WARN(ret & ": Unable to create MANF_DIR")
+                return ret
+            end if
+            ret = shell( MK_DIR & CONF_DIR )
+            if ret <> 0 then
+                WARN(ret & ": Unable to create CONF_DIR")
+                return ret
+            end if
+            ret = shell( "mkdir -p " & CACHE_DIR )
+            if ret <> 0 then
+                WARN(ret & ": Unable to create CACHE_DIR")
+                return ret
+            end if
+            return ret
     end if
 
-    ff = freefile
-    installed = new package_list
+    if installed = NULL then installed = new package_list
     if fileexists(INST_LIST) then
-        if open(INST_LIST, for binary, access read, as #ff) <> 0 then
-            WARN("Unable to read from package list.")
-            return
-        else
-            var cur_line = ""
-            line input #ff, cur_line
-            var num_pkgs = valuint(cur_line)
-            INFO(num_pkgs & " packages currently installed.")
-            if installed = NULL then
-                installed = new package_list
-            end if
-            for n as uinteger = 0 to num_pkgs -1
-                dim curpkg as package_desc
-                line input #ff, curpkg._name
-                line input #ff, curpkg._desc
-                line input #ff, curpkg._depends
-                line input #ff, cur_line
-                curpkg.version = valuint(cur_line)
-                line input #ff, cur_line 'blank line seperating packages
-                installed->addItem(curpkg)
-            next
-            close #ff
+        ret = installed->readFromFile(INST_LIST)
+        if ret <> FALSE then
+            WARN("Unable to read from installed package list.")
         end if
+        INFO(installed->cnt & " packages are installed.")
     else
-        INFO("No packages installed.")
+        INFO("No packages are currently installed.")
     end if
 
     close
-
-end sub
+    return ret
+end function
